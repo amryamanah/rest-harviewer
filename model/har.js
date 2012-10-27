@@ -7,6 +7,10 @@
  * To change this template use File | Settings | File Templates.
  */
 
+
+var har = require('../utils/harAnalyzer.js');
+var harAnalyzer = new har.HarAnalyzer("../sample/HEL_SLA_chrome1.har");
+console.log(harAnalyzer);
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
