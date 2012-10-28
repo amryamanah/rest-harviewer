@@ -9,14 +9,16 @@
 
 var fs = require('fs');
 var async = require('async');
+var moment = require('moment');
 
-exports.HarAnalyzer =  function(harpath) {
+
+exports.HarAnalyzer =  function HarAnalyzer(harpath) {
 
   var harPath = harpath;
 
 
   function getHar(){
-    raw = fs.readFileSync(harPath);
+    var raw = fs.readFileSync(harPath);
     return JSON.parse(raw);
   };
 
@@ -25,13 +27,16 @@ exports.HarAnalyzer =  function(harpath) {
   }
 
   function getDnsTIme(har_input){
-    dnsTime = har_input.timings.dns
+    var dnsTime = har_input.timings.dns
     return Math.max()
   }
 
   function entryAnalyzer(entry){
-
     var request = entry.length;
+    var min_timestamp = Math.pow(10,14);
+    var max_timestamp = 0;
+    var time_start = null;
+    var time_stop = null;
 
     function getDnsTime(){
       //getting total dns time
@@ -40,18 +45,18 @@ exports.HarAnalyzer =  function(harpath) {
         totalDnsTime = totalDnsTime + Math.max(x.timings.dns,0);
       },function(err){console.log(err)});
       return totalDnsTime;
-    };
+    }
 
     function getTransferTime(){
       //getting total transfer time
       var totalTransferTime = 0;
       async.forEach(entry, function calculateTransfer(x,callback){
-        receiveTime = Math.max(x.timings.receive,0);
-        sendTime = Math.max(x.timings.send,0);
+        var receiveTime = Math.max(x.timings.receive,0);
+        var sendTime = Math.max(x.timings.send,0);
         totalTransferTime = totalTransferTime + (receiveTime - sendTime);
       },function(err){console.log(err)});
       return totalTransferTime;
-    };
+    }
 
     function getSendTime(){
       //getting time spend to send
@@ -60,7 +65,7 @@ exports.HarAnalyzer =  function(harpath) {
         totalSendTime = totalSendTime + Math.max(x.timings.send,0);
       },function(err){console.log(err)});
       return totalSendTime;
-    };
+    }
 
     function getServerTime(){
       //getting time spend in the server
@@ -92,18 +97,124 @@ exports.HarAnalyzer =  function(harpath) {
     function getResponseSize(){
       var totalResponzeSize = 0;
       async.forEach(entry,function calculateResponse(x,callback){
-        compressed_size = Math.max(x.response.bodySize, 0);
+        var compressed_size = Math.max(x.response.bodySize, 0);
         if (compressed_size === 0){
           totalResponzeSize = totalResponzeSize + Math.max(x.response.content.size, 0);
         }
         else{
           totalResponzeSize = totalResponzeSize + compressed_size;
-        };
+        }
       },function(err){console.log(err)});
       return totalResponzeSize / 1024.0;
-    };
+    }
 
+    function timeToFirstByte(){
+      var timeToFirstByte = 0;
+      var count = 0;
 
+      async.forEach(entry,function(x,callback){
+        count = count +1;
+//        console.log(count);
+        var raw_date = x.startedDateTime;
+        var start = moment(raw_date);
+        var completed = moment(raw_date).add('milliseconds', x.time);
+
+        if(completed.unix() > max_timestamp){
+          max_timestamp = completed.unix();
+          time_stop = completed;
+        }
+        if(start.unix() < min_timestamp){
+          min_timestamp = start.unix();
+          time_start = start;
+          var blockingtime = Math.max(x.timings.blocked,0);
+          var dnstime = Math.max(x.timings.dns,0);
+          var connecttime = Math.max(x.timings.connect,0);
+          var sendtime = Math.max(x.timings.send,0);
+          var servertime = Math.max(x.timings.wait,0);
+
+          timeToFirstByte= blockingtime+dnstime+connecttime+sendtime+servertime;
+        }
+
+      },function(err){console.log(err)});
+      return timeToFirstByte;
+
+    }
+
+    function getRedirect(){
+      //getting redirection
+      var redirect = 0;
+      async.forEach(entry, function calculateRedirect(x,callback){
+        if(x.response.status >= 300 && x.response.status < 400){
+          redirect = redirect + 1;
+        }
+      },function(err){console.log(err)});
+      return redirect;
+    }
+
+    function getBadRequest(){
+      //getting redirection
+      var badRequest = 0;
+      async.forEach(entry, function calculateRedirect(x,callback){
+        if(x.response.status > 400){
+          badRequest = badRequest + 1;
+        }
+      },function(err){console.log(err)});
+      return badRequest;
+    }
+
+    function getTextSize(){
+      var totalTextSize = 0;
+      async.forEach(entry,function(x,callback){
+        var mime = x.response.content.mimeType.toLowerCase();
+
+        if(mime.search("text") >= 0 || mime.search("javascript") >= 0 || mime.search("html") >= 0 || mime.search("json") >= 0 || mime.search("xml") >= 0 ){
+          var compressed_size = Math.max(x.response.bodySize, 0);
+          if (compressed_size === 0){
+            totalTextSize = totalTextSize + Math.max(x.response.content.size, 0);
+          }
+          else{
+            totalTextSize = totalTextSize + compressed_size;
+          }
+        }
+      },function(err){console.log(err)});
+      return totalTextSize/1024.0;
+    }
+
+    function getFontSize(){
+      var totalFontSize = 0;
+      async.forEach(entry,function(x,callback){
+        var mime = x.response.content.mimeType.toLowerCase();
+
+        if(mime.search("font") >= 0){
+          var compressed_size = Math.max(x.response.bodySize, 0);
+          if (compressed_size === 0){
+            totalFontSize = totalFontSize + Math.max(x.response.content.size, 0);
+          }
+          else{
+            totalFontSize = totalFontSize + compressed_size;
+          }
+        }
+      },function(err){console.log(err)});
+      return totalFontSize/1024.0;
+    }
+
+    function getMediaSize(){
+      var totalMediaSize = 0;
+      async.forEach(entry,function(x,callback){
+        var mime = x.response.content.mimeType.toLowerCase();
+
+        if(mime.search("image") >= 0 ){
+          var compressed_size = Math.max(x.response.bodySize, 0);
+          if (compressed_size === 0){
+            totalMediaSize = totalMediaSize + Math.max(x.response.content.size, 0);
+          }
+          else{
+            totalMediaSize = totalMediaSize + compressed_size;
+          }
+        }
+      },function(err){console.log(err)});
+      return totalMediaSize/1024.0;
+    }
 
     return {
       dnsTime : getDnsTime(),
@@ -113,18 +224,25 @@ exports.HarAnalyzer =  function(harpath) {
       AvgConnectTime : Math.abs(getConnectingTime()/request),
       AvgBlockingTime : Math.abs(getBlockingTime()/request),
       responseSize : getResponseSize(),
-      request: request
+      timeToFirstByte : timeToFirstByte(),
+      fullLoadTime : time_stop.diff(time_start),
+      request: request,
+      redirect : getRedirect(),
+      badRequest : getBadRequest(),
+      totalTextSize : Math.ceil(getTextSize()),
+      totalFontSize : Math.ceil(getFontSize()),
+      totalMediaSize : Math.ceil(getMediaSize())
     }
   }
 
   var analyze = function(){
-    raw_har = getHar();
-    entries = raw_har.log.entries;
-    entry = entryAnalyzer(entries);
-    name = raw_har.log.pages[0].id;
-    onLoad = raw_har.log.pages[0].pageTimings.onLoad;
-    onContentLoad = raw_har.log.pages[0].pageTimings.onContentLoad;
-//    entry["response"]["bodySize"]
+    var raw_har = getHar();
+    var entries = raw_har.log.entries;
+    var entry = entryAnalyzer(entries);
+    var name = raw_har.log.pages[0].id;
+    var onLoad = raw_har.log.pages[0].pageTimings.onLoad;
+    var onContentLoad = raw_har.log.pages[0].pageTimings.onContentLoad;
+
 
 
     return {
@@ -132,58 +250,9 @@ exports.HarAnalyzer =  function(harpath) {
       timeOnLoad : onLoad,
       timeOnContentLoad : onContentLoad,
       entry: entry
+//      ,rawEntry : entries
     };
   };
   return analyze();
-}
-
-
-
-
-
-//function extractTime(entry){
-//  var min_timestamp = Math.pow(10,14);
-//  var max_timestamp = 0;
-//  var timeToFirstByte = 0;
-//  async.forEach(entry,function(x,callback){
-//    raw_date = x.startedDateTime;
-////    console.log(x.startedDateTime);
-//    date = raw_date.split("T")[1];
-//    //for firebug
-//    raw_time1 = date.split('+')[0];
-//    //for chrome developer tools
-//    raw_time2 = raw_time1.split('Z')[0];
-//    time = raw_time2.split(':');
-//    hours = time[0];
-//    minutes = time[1];
-//    seconds = time[2].split('.')[0];
-//    milliseconds = time[2].split('.')[1];
-//    timeRequestStarted = seconds + (minutes*60) + (hours*3600000) + (milliseconds);
-//    timeRequestCompleted = timeRequestStarted + (x.time);
-//    start = timeRequestStarted/1000;
-//    complete = timeRequestCompleted/1000;
-////    console.log(start);
-////    console.log(complete);
-//    if(complete > max_timestamp){
-//      max_timestamp = complete;
-//    }else if(start < min_timestamp){
-//      min_timestamp = start;
-//      timeToFirstByte= Math.max(x.timings.blocked,0) + Math.max(x.timings.dns,0) + Math.max(x.timings.connect,0) + Math.max(x.timings.send,0)+Math.max(x.timings.wait,0)
-//    }
-//  },function(err){console.log(err)});
-//  console.log(timeToFirstByte);
-//  return timeToFirstByte;
-//
-//};
-
-
-//var firefox = new HarAnalyzer('../sample/cp.blue.gtn.har');
-//var chrome = new HarAnalyzer('../sample/HEL_SLA_chrome1.har');
-//console.log(chrome);
-////var dns_time = entryAnalyzer(chrome.entry);
-////console.log(dns_time);
-//////extractTime(chrome.entry);
-
-
-
+};
 
