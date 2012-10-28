@@ -42,6 +42,7 @@ exports.show = function(req,res){
 exports.upload = function(req, res) {
 	var tmp_path = req.files.upload.path;
 	var target_path = './uploads/' + req.files.upload.name;
+	console.log(target_path);
 	fs.rename(tmp_path, target_path, function(err) {
 		if (err) throw err;
 		fs.unlink(tmp_path, function() {
