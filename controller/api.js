@@ -7,28 +7,23 @@
  * To change this template use File | Settings | File Templates.
  */
 
-
+var fs = require('fs');
 var HAR = require('../model/har.js');
 var url = require('url');
-exports.save = function(req, res) {
-  console.log("this is post request");
-  var har = require('../utils/harAnalyzer.js');
-  var harAnalyzer = new har.HarAnalyzer(__dirname+"/HEL_SLA_chrome1.har");
-  var data = new HAR(harAnalyzer);
-  data.save(function (err) {
-    if (err) throw err;
-    console.log('Task saved.');
 
-    res.send('HAR saved.');
-  });
+exports.delete = function(req,res){
+	parse = url.parse(req.url,true);
+	console.log(parse);
+	HAR.remove(parse.query,function(err) {
+		if(err)throw err;
+	});
 };
 
 exports.list = function(req,res){
-  console.log("this is find request");
+  console.log("list");
   HAR.find(function (err, har) {
     if (err) {return console.log(err)}
       console.log(har);
-//      res.writeHead(200,{"Content-Type" : "application/json"});
       res.json(har);
   });
 };
@@ -43,3 +38,27 @@ exports.show = function(req,res){
       res.json(har);
   });
 };
+
+exports.upload = function(req, res) {
+	var tmp_path = req.files.upload.path;
+	var target_path = './uploads/' + req.files.upload.name;
+	fs.rename(tmp_path, target_path, function(err) {
+		if (err) throw err;
+		fs.unlink(tmp_path, function() {
+			if (err) throw err;
+			var har = require('../utils/harAnalyzer.js');
+			var harAnalyzer = new har.HarAnalyzer(target_path);
+			var data = new HAR(harAnalyzer);
+			data.save(function (err) {
+				if (err) throw err;
+				fs.unlink(target_path,function(err){
+					if(err)throw err;
+					console.log('Task saved.');
+					res.send('File uploaded to: ' + target_path + ' - ' + req.files.upload.size + ' bytes'+ 'HAR saved.');
+					res.send('HAR saved.');
+				});
+			});
+		});
+	});
+
+}

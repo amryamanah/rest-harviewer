@@ -21,7 +21,9 @@
 
   "dependencies": {
     "mongoose": "latest",
-    "express": "latest"
+    "express": "latest",
+    "async": "latest",
+    "moment": "latest"
   },
   "devDependencies": {},
   "bundleDependencies": [],

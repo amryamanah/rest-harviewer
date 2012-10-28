@@ -7,7 +7,7 @@
  * To change this template use File | Settings | File Templates.
  */
 
-
+var fs = require('fs');
 var express = require('express');
 var mongoose = require('mongoose');
 var app = express();
@@ -19,15 +19,35 @@ dbhost = 'localhost';
 mongoose.connect('mongodb://localhost/rest-harviewer');
 
 app.configure(function () {
-  app.use(express.bodyParser());
+	app.use(express.bodyParser({uploadDir:'./uploads'}));
   app.use(express.methodOverride());
   app.use(app.router);
+	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+	app.use(express.static(__dirname + '/public'));
 });
 
 // set up the RESTful API, handler methods are defined in api.js
-app.get('/harviewer/save', api.save);
-app.get('/harviewer/', api.list);
+//app.get('/harviewer/save', api.save);
+app.get('/harviewer', api.list);
+
+//example use http://localhost:3002/harviewer/find/?_id=508d524fb4c88d9f0e000003
 app.get('/harviewer/find', api.show);
+
+//example use http://localhost:3002/harviewer/delete/?_id=508d524fb4c88d9f0e000003
+app.get('/harviewer/delete', api.delete);
+app.get('/harviewer/upload', function(req,res){
+	res.writeHead(200, {'content-type': 'text/html'});
+	res.write(
+		'<form action="/harviewer/upload" enctype="multipart/form-data" method="post">'+
+			'<input type="text" name="title"><br>'+
+			'<input type="file" name="upload" multiple="multiple"><br>'+
+			'<input type="submit" value="Upload">'+
+			'</form>'
+	);
+	res.end();
+});
+
+app.post('/harviewer/upload', api.upload);
 
 appPort = 3002;
 //  And start the app on that interface (and port).
