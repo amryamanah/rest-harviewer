@@ -11,17 +11,31 @@
 var express = require('express');
 var mongoose = require('mongoose');
 var app = express();
+var api = require('./controller/api.js');
 
 
-var ipaddr  = process.env.IP || '127.0.0.1';
-var port    = process.env.port || 3001;
-var dbhost  = process.env.dbhost || '127.0.0.1';
-var dbport  = process.env.dbport || 27017;
-var dbuname = process.env.dbname || 'HAR';
-var dbpwd   = process.env.dbpass || null;
-
+dbhost = 'localhost';
 //establish connection to mongo database
-mongoose.connect('mongodb://'+dbuname+':'+dbpwd+'@'+dbhost+':'+dbport+'/nodetest');
+mongoose.connect('mongodb://localhost/rest-harviewer');
 
-var db = mongoose.Crea
+app.configure(function () {
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(app.router);
+});
+
+// set up the RESTful API, handler methods are defined in api.js
+app.get('/harviewer/save', api.save);
+app.get('/harviewer/', api.list);
+app.get('/harviewer/find', api.show);
+
+appPort = 3002;
+//  And start the app on that interface (and port).
+app.listen(appPort,function(err){
+  if(err){
+    console.log(err);
+  }
+  console.log("application started at " + 3002);
+
+});
 

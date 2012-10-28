@@ -9,33 +9,37 @@
 
 
 var HAR = require('../model/har.js');
-
-
-exports.post = function(req, res) {
-  var har = new HAR(
-    {
-      name: String,
-      description: String,
-      date: {type: Date, default: Date.now},
-      full_load_time: Number,
-      total_dns_time: Number,
-      total_transfer_time: Number,
-      total_server_time: Number,
-      avg_connecting_time: Number,
-      avg_blocking_time: Number,
-      total_size: Number,
-      text_size: Number,
-      media_size: Number,
-      cache_size: Number,
-      redirects: Number,
-      bad_requests: Number,
-      domains: Number
-    }
-  );
-  dogtag.save(function (err) {
+var url = require('url');
+exports.save = function(req, res) {
+  console.log("this is post request");
+  var har = require('../utils/harAnalyzer.js');
+  var harAnalyzer = new har.HarAnalyzer(__dirname+"/HEL_SLA_chrome1.har");
+  var data = new HAR(harAnalyzer);
+  data.save(function (err) {
     if (err) throw err;
     console.log('Task saved.');
 
-    res.send('Dogtag saved.');
+    res.send('HAR saved.');
   });
-}
+};
+
+exports.list = function(req,res){
+  console.log("this is find request");
+  HAR.find(function (err, har) {
+    if (err) {return console.log(err)}
+      console.log(har);
+//      res.writeHead(200,{"Content-Type" : "application/json"});
+      res.json(har);
+  });
+};
+
+exports.show = function(req,res){
+  console.log("this is find request");
+  parse = url.parse(req.url,true);
+  console.log(parse);
+  HAR.find(parse.query,function (err, har) {
+    if (err) {return console.log(err)}
+      console.log(har);
+      res.json(har);
+  });
+};

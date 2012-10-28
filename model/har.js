@@ -8,30 +8,33 @@
  */
 
 
-var har = require('../utils/harAnalyzer.js');
-var harAnalyzer = new har.HarAnalyzer("../sample/HEL_SLA_chrome1.har");
-console.log(harAnalyzer);
+
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var harSchema = new Schema({
   name: String,
-  description: String,
   date: {type: Date, default: Date.now},
-  full_load_time: Number,
-  total_dns_time: Number,
-  total_transfer_time: Number,
-  total_server_time: Number,
-  avg_connecting_time: Number,
-  avg_blocking_time: Number,
-  total_size: Number,
-  text_size: Number,
-  media_size: Number,
-  cache_size: Number,
-  redirects: Number,
-  request: Number,
-  bad_requests: Number,
-  domains: Number
+  timeOnLoad: Number,
+  timeOnContentLoad: Number,
+  entry: {
+    dnsTime:Number,
+    transferTime:Number,
+    sendTime:Number,
+    serverTime:Number,
+    AvgConnectTime:Number,
+    AvgBlockingTime:Number,
+    responseSize:Number,
+    timeToFirstByte:Number,
+    fullLoadTime:Number,
+    request:Number,
+    redirect:Number,
+    badRequest:Number,
+    totalTextSize:Number,
+    totalFontSize:Number,
+    totalMediaSize:Number
+  }
 });
+harSchema.set('toJSON', { getters: true, virtuals: false });
 
 module.exports = mongoose.model('HAR', harSchema);
