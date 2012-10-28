@@ -19,7 +19,7 @@ dbhost = 'localhost';
 mongoose.connect('mongodb://localhost/rest-harviewer');
 
 app.configure(function () {
-	app.use(express.bodyParser({uploadDir:'./uploads'}));
+	app.use(express.bodyParser({uploadDir:'./'}));
   app.use(express.methodOverride());
   app.use(app.router);
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
