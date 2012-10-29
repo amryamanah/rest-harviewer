@@ -40,8 +40,8 @@ exports.show = function(req,res){
 };
 
 exports.upload = function(req, res) {
-	var tmp_path = req.files.upload.path;
-	var target_path = './' + req.files.upload.name;
+	var tmp_path = req.files.file.path;
+	var target_path = './' + req.files.file.name;
 	console.log(target_path);
 	fs.rename(tmp_path, target_path, function(err) {
 		if (err) throw err;
@@ -55,7 +55,7 @@ exports.upload = function(req, res) {
 				fs.unlink(target_path,function(err){
 					if(err)throw err;
 					console.log('Task saved.');
-					res.send('File uploaded to: ' + target_path + ' - ' + req.files.upload.size + ' bytes'+ 'HAR saved.');
+					res.send('File uploaded to: ' + target_path + ' - ' + req.files.file.size + ' bytes'+ 'HAR saved.');
 					res.send('HAR saved.');
 				});
 			});

@@ -40,7 +40,7 @@ app.get('/harviewer/upload', function(req,res){
 	res.write(
 		'<form action="/harviewer/upload" enctype="multipart/form-data" method="post">'+
 			'<input type="text" name="title"><br>'+
-			'<input type="file" name="upload" multiple="multiple"><br>'+
+			'<input type="file" name="file" multiple="multiple"><br>'+
 			'<input type="submit" value="Upload">'+
 			'</form>'
 	);
