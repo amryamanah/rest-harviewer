@@ -13,7 +13,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var harSchema = new Schema({
-	id : String,
+	filename : String,
   label: String,
   date: {type: Date, default: Date.now},
   timeOnLoad: Number,

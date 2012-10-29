@@ -246,7 +246,7 @@ exports.HarAnalyzer =  function HarAnalyzer(harpath) {
 
 
     return {
-	    id : harpath.replace('./', ''),
+	    filename : harpath.replace('./', ''),
       label : name,
       timeOnLoad : onLoad,
       timeOnContentLoad : onContentLoad,

@@ -24,7 +24,7 @@ exports.list = function(req,res){
   HAR.find(function (err, har) {
     if (err) {return console.log(err)}
       console.log(har);
-      res.json(har);
+      res.json({result: har, total: har.length});
   });
 };
 
