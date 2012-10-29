@@ -19,6 +19,7 @@ dbhost = 'localhost';
 mongoose.connect('mongodb://localhost/rest-harviewer');
 
 app.configure(function () {
+
 	app.use(express.bodyParser({uploadDir:'./'}));
   app.use(express.methodOverride());
   app.use(app.router);
@@ -34,7 +35,11 @@ app.get('/harviewer', api.list);
 app.get('/harviewer/find', api.show);
 
 //example use http://localhost:3002/harviewer/delete/?_id=508d524fb4c88d9f0e000003
+
 app.get('/harviewer/delete', api.delete);
+
+app.delete('/harviewer/delete', api.delete);
+
 app.get('/harviewer/upload', function(req,res){
 	res.writeHead(200, {'content-type': 'text/html'});
 	res.write(
