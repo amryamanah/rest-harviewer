@@ -14,9 +14,8 @@ var app = express();
 var api = require('./controller/api.js');
 
 
-dbhost = 'localhost';
 //establish connection to mongo database
-mongoose.connect('mongodb://localhost/rest-harviewer');
+mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
 
 app.configure(function () {
 
@@ -55,13 +54,13 @@ app.put('/haviewer/upload', api.upload2);
 
 app.post('/harviewer/upload', api.upload2);
 
-appPort = 3002;
+appPort = 8080;
 //  And start the app on that interface (and port).
 app.listen(appPort,function(err){
   if(err){
     console.log(err);
   }
-  console.log("application started at " + 3002);
+  console.log("application started at " + 8080);
 
 });
 
