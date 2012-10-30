@@ -24,7 +24,7 @@ exports.delete = function(req,res){
 			HAR.remove(parse.query,function(err) {
 				if(err)notFound(err);
 				console.log(parse.query);
-				res.send('200',"Delete request for " + JSON.stringify(parse.query) + " success" );
+				res.send('200',{status :"Delete request for " + JSON.stringify(parse.query) + " success"} );
 			});
 		}
 	});
@@ -37,7 +37,7 @@ exports.list = function(req,res){
   HAR.find(function (err, har) {
 	  if(err)res.send(500, { error: 'something blew up' });
 
-    res.json({result: har, total: har.length});
+    res.json(200,{result: har, total: har.length});
   });
 };
 
@@ -48,7 +48,7 @@ exports.show = function(req,res){
   HAR.find(parse.query,function (err, har) {
 	  if(err)res.send(500, { error: 'something blew up' });
 	  if(har.length === 0)res.send(404, {error :'File Not Found'});
-    res.json(har);
+    res.json(200,{result: har, total: har.length});
   });
 };
 
@@ -149,6 +149,6 @@ exports.upload2 = function(req,res){
 	},function(err,results){
 		if(err){console.log(err)}
 		console.log(results);
-		res.send(200, 'OK');
+		res.send(200, {status:'OK'});
 	});
 };
