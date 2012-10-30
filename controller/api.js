@@ -37,7 +37,7 @@ exports.list = function(req,res){
   HAR.find(function (err, har) {
 	  if(err)res.send(500, { error: 'something blew up' });
 
-    res.json(200,{result: har, total: har.length});
+    res.json(200,{total: har.length ,result: har });
   });
 };
 
@@ -48,7 +48,7 @@ exports.show = function(req,res){
   HAR.find(parse.query,function (err, har) {
 	  if(err)res.send(500, { error: 'something blew up' });
 	  if(har.length === 0)res.send(404, {error :'File Not Found'});
-    res.json(200,{result: har, total: har.length});
+    res.json(200,{total: har.length ,result: har });
   });
 };
 
