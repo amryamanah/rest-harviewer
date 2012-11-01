@@ -35,8 +35,8 @@ var allowCrossDomain = function(req, res, next) {
 app.configure(function () {
 	app.use(allowCrossDomain);
 	app.use(express.bodyParser({uploadDir:'./'}));
-    app.use(express.methodOverride());
-    app.use(app.router);
+  app.use(express.methodOverride());
+  app.use(app.router);
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 	app.use(express.static(__dirname + '/public'));
 });
