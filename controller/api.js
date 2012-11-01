@@ -36,7 +36,6 @@ exports.list = function(req,res){
 
   HAR.find(function (err, har) {
 	  if(err)res.send(500, { error: 'something blew up' });
-
     res.json(200,{total: har.length ,result: har });
   });
 };

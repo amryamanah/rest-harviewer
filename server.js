@@ -16,21 +16,30 @@ var api = require('./controller/api.js');
 
 dbhost = 'localhost';
 //establish connection to mongo database
-mongoose.connect('mongodb://localhost/rest-harviewer');
+mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
+
+var allowCrossDomain = function(req, res, next) {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+	res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+
+	// intercept OPTIONS method
+	if ('OPTIONS' == req.method) {
+		res.send(200);
+	}
+	else {
+		next();
+	}
+};
+
 
 app.configure(function () {
-
+	app.use(allowCrossDomain);
 	app.use(express.bodyParser({uploadDir:'./'}));
   app.use(express.methodOverride());
   app.use(app.router);
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 	app.use(express.static(__dirname + '/public'));
-	app.all('*', function(req, res, next) {
-		res.header('Access-Control-Allow-Origin', '*');
-		res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-		res.header('Access-Control-Allow-Headers', 'Content-Type');
-		next();
-	});
 });
 
 // set up the RESTful API, handler methods are defined in api.js
@@ -61,13 +70,13 @@ app.put('/haviewer/upload', api.upload2);
 
 app.post('/harviewer/upload', api.upload2);
 
-appPort = 3002;
+appPort = 8080;
 //  And start the app on that interface (and port).
 app.listen(appPort,function(err){
   if(err){
     console.log(err);
   }
-  console.log("application started at " + 3002);
+  console.log("application started at " + appPort);
 
 });
 
