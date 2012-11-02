@@ -48,6 +48,7 @@ app.get('/harviewer', api.list);
 
 //example use http://localhost:3002/harviewer/find/?_id=508d524fb4c88d9f0e000003
 app.get('/harviewer/find', api.show);
+app.get('/harviewer/sort', api.sort);
 
 //example use http://localhost:3002/harviewer/delete/?_id=508d524fb4c88d9f0e000003
 
@@ -66,9 +67,9 @@ app.get('/harviewer/upload', function(req,res){
 	);
 	res.end();
 });
-app.put('/haviewer/upload', api.upload);
+app.put('/haviewer/upload', api.upload2);
 
-app.post('/harviewer/upload', api.upload);
+app.post('/harviewer/upload', api.upload2);
 
 appPort = 8080;
 //  And start the app on that interface (and port).
@@ -79,4 +80,6 @@ app.listen(appPort,function(err){
   console.log("application started at " + appPort);
 
 });
+
+
 
