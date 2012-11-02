@@ -34,8 +34,6 @@ exports.delete = function(req,res){
 	});
 };
 
-
-
 exports.list = function(req,res){
 
   HAR.find(function (err, har) {
@@ -60,12 +58,10 @@ exports.show = function(req,res){
   });
 };
 
-
-
 exports.sort = function(req,res){
 
   parse = url.parse(req.url,true);
-
+  console.log(parse);
   HAR.find(parse.query,function (err, har) {
     if(err) {
       res.send(500, {
@@ -79,98 +75,47 @@ exports.sort = function(req,res){
 
     var allLoadTimes = [];
     var fullLoadTime = {};
+    fullLoadTime.name = "fullLoadTime";
     for (var i=0;i<har.length;i++) {
-      console.log(har[i].entry.fullLoadTime);
-      fullLoadTime = {};
-      fullLoadTime.name = "fullLoadTime";
       fullLoadTime["data" + i] = har[i].entry.fullLoadTime;
-      allLoadTimes.push(fullLoadTime);
     }
-    console.log(fullLoadTime);
+    allLoadTimes.push(fullLoadTime);
     res.json(200,allLoadTimes);
   });
 };
 
 
-exports.upload2 = function(req, res) {
-  console.log(req.files);
-  console.log(req.url);
+exports.upload = function(req, res) {
   var tmp_path = req.files.file.path;
   var target_path = './' + req.files.file.name;
-  console.log(target_path);
   fs.rename(tmp_path, target_path, function(err) {
     if(err){
-      console.error(err);
       res.send(500, { error: 'something blew up' });
     }
     fs.unlink(tmp_path, function() {
       if(err){
-        console.error(err);
         res.send(500, { error: 'something blew up' });
       }
-
-    var harAnalyzer = new har.HarAnalyzer(target_path);
-    var data = new HAR(harAnalyzer);
-    data.save(function (err) {
-      if(err){
-        console.error(err);
-        res.send(500, { error: 'something blew up' });
-      }
-      fs.unlink(target_path,function(err){
-        if(err){
-          console.error(err);
-          res.send(500, { error: 'something blew up' });
-        }
-        res.send(200,{status : "upload success"})
-
-
-      });
-    });
+      analyze(res,target_path);
     });
   });
 };
 
-exports.upload = function(req,res){
-//  console.log(req.files);
-  var tmp_path = req.files.file.path;
-  var target_path = './' + req.files.file.name;
-  console.log(target_path);
-
-  async.series({
-    one : function(callback){
-      fs.rename(tmp_path,target_path,function(err){
-        if(err){
-          console.error(err);
-          res.send(500, { error: 'Internal Server Error' });
-        }
-      });
-      callback(null, 1 );
-    },
-
-    two: function(callback){
-      var harAnalyzer = new har.HarAnalyzer(target_path);
-      var data = new HAR(harAnalyzer);
-      data.save(function (err) {
-        if(err){
-          console.error(err);
-          res.send(500, { error: 'something blew up' });
-        }
-      });
-      callback(null, 2);
-    },
-
-    three: function(callback){
-      fs.unlink(target_path,function(err){
-        if(err){
-          console.error(err);
-          res.send(500, { error: 'something blew up' });
-        }
-      });
-      callback(null,3);
+function analyze(res,target_path){
+  var harAnalyzer = new har.HarAnalyzer(target_path);
+  var data = new HAR(harAnalyzer);
+  data.save(function (err) {
+    if(err){
+      res.send(500, { error: 'something blew up' });
     }
-  },function(err,results){
-    if(err){console.log(err)}
-//		console.log(results);
-    res.send(200, {status:'OK'});
+    fs.unlink(target_path,function(err){
+      if(err){
+        res.send(500, { error: 'something blew up' });
+      }
+      res.send(200,{status : "upload success"})
+
+
+    });
   });
-};
+}
+

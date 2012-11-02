@@ -67,9 +67,9 @@ app.get('/harviewer/upload', function(req,res){
 	);
 	res.end();
 });
-app.put('/haviewer/upload', api.upload2);
+app.put('/haviewer/upload', api.upload);
 
-app.post('/harviewer/upload', api.upload2);
+app.post('/harviewer/upload', api.upload);
 
 appPort = 8080;
 //  And start the app on that interface (and port).
