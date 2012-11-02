@@ -14,9 +14,9 @@ var app = express();
 var api = require('./controller/api.js');
 
 
-dbhost = 'localhost';
 //establish connection to mongo database
-mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
+//mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
+mongoose.connect('mongodb://localhost/rest-harviewer');
 
 var allowCrossDomain = function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
@@ -66,9 +66,9 @@ app.get('/harviewer/upload', function(req,res){
 	);
 	res.end();
 });
-app.put('/haviewer/upload', api.upload2);
+app.put('/haviewer/upload', api.upload);
 
-app.post('/harviewer/upload', api.upload2);
+app.post('/harviewer/upload', api.upload);
 
 appPort = 8080;
 //  And start the app on that interface (and port).

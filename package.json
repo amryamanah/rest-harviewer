@@ -9,25 +9,18 @@
     "name": "Amry Fitra",
     "email": "amryfitra@gmail.com"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ndoetz/rest-harviewer.git"
+  "scripts": {
+    "start": "server.js"
   },
-
   "engines": {
     "node": ">= 0.6.0",
     "npm": ">= 1.0.0"
   },
-
   "dependencies": {
     "mongoose": "latest",
     "express": "latest",
     "async": "latest",
     "moment": "latest"
   },
-  "devDependencies": {},
-  "bundleDependencies": [],
-
-  "private": true,
-  "main": "server.js"
+  "subdomain": "ndoetz.rest-harviewer"
 }
