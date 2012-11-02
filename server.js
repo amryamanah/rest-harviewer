@@ -15,7 +15,8 @@ var api = require('./controller/api.js');
 
 
 //establish connection to mongo database
-mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
+//mongoose.connect('mongodb://nodejitsu:05fe459fc2e94f9344b67800525ad79a@alex.mongohq.com:10094/nodejitsudb424859154831');
+mongoose.connect('mongodb://localhost/rest-harviewer');
 
 var allowCrossDomain = function(req, res, next) {
 	res.header('Access-Control-Allow-Origin', '*');
