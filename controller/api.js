@@ -17,25 +17,29 @@ var har = require('../utils/harAnalyzer.js');
 exports.delete = function(req,res){
 	parse = url.parse(req.url,true);
 
-	HAR.find(parse.query.label,function (error, har) {
-		if(error)res.send(500, { error: 'something blew up' });
-		if(har.length === 0)res.send(404, {error :'File Not Found'});
+	HAR.find(parse.query,function (error, har) {
+		if(error){
+      res.send(500, { error: 'something blew up' });
+    }
+		if(har.length === 0){
+      res.send(404, {error :'File Not Found'});
+    }
 		else{
-			HAR.remove(parse.query.label,function(err) {
+			HAR.remove(parse.query,function(err) {
 				if(err)notFound(err);
 				console.log(parse.query);
 				res.send('200',{status :"Delete request for " + JSON.stringify(parse.query) + " success"} );
 			});
 		}
 	});
-
-
 };
 
 exports.list = function(req,res){
 
   HAR.find(function (err, har) {
-	  if(err)res.send(500, { error: 'something blew up' });
+	  if(err){
+      res.send(500, { error: 'something blew up' });
+    }
     res.json(200,{total: har.length ,result: har });
   });
 };
@@ -43,54 +47,75 @@ exports.list = function(req,res){
 exports.show = function(req,res){
 
   parse = url.parse(req.url,true);
-
-  HAR.find(parse.query.label,function (err, har) {
-	  if(err)res.send(500, { error: 'something blew up' });
-	  if(har.length === 0)res.send(404, {error :'File Not Found'});
+  HAR.find(parse.query,function (err, har) {
+	  if(err){
+      res.send(500, { error: 'something blew up' });
+    }
+	  if(har.length === 0){
+      res.send(404, {error :'File Not Found'});
+    }
     res.json(200,{total: har.length ,result: har });
   });
 };
 
-exports.upload = function(req,res){
-//  console.log(req.files);
-	var tmp_path = req.files.file.path;
-	var target_path = './' + req.files.file.name;
+exports.sort = function(req,res){
 
-	async.series({
-		one : function(callback){
-			fs.rename(tmp_path,target_path,function(err){
-				if(err){
-					console.error(err);
-					res.send(500, { error: 'Internal Server Error' });
-				}
-			});
-			callback(null, 1 );
-		},
+  parse = url.parse(req.url,true);
+  console.log(parse);
+  HAR.find(parse.query,function (err, har) {
+    if(err) {
+      res.send(500, {
+        error: 'something blew up'
+      });
+    }
 
-		two: function(callback){
-			var harAnalyzer = new har.HarAnalyzer(target_path);
-			var data = new HAR(harAnalyzer);
-			data.save(function (err) {
-				if(err){
-					console.error(err);
-					res.send(500, { error: 'something blew up' });
-				}
-			});
-			callback(null, 2);
-		},
+    if(har.length === 0) {
+      res.send(404, {error :'File Not Found'});
+    }
 
-		three: function(callback){
-			fs.unlink(target_path,function(err){
-				if(err){
-					console.error(err);
-					res.send(500, { error: 'something blew up' });
-				}
-			});
-			callback(null,3);
-		}
-	},function(err,results){
-		if(err){console.log(err)}
-//		console.log(results);
-		res.send(200, {status:'OK'});
-	});
+    var allLoadTimes = [];
+    var fullLoadTime = {};
+    fullLoadTime.name = "fullLoadTime";
+    for (var i=0;i<har.length;i++) {
+      fullLoadTime["data" + i] = har[i].entry.fullLoadTime;
+    }
+    allLoadTimes.push(fullLoadTime);
+    res.json(200,allLoadTimes);
+  });
 };
+
+
+exports.upload = function(req, res) {
+  var tmp_path = req.files.file.path;
+  var target_path = './' + req.files.file.name;
+  fs.rename(tmp_path, target_path, function(err) {
+    if(err){
+      res.send(500, { error: 'something blew up' });
+    }
+    fs.unlink(tmp_path, function() {
+      if(err){
+        res.send(500, { error: 'something blew up' });
+      }
+      analyze(res,target_path);
+    });
+  });
+};
+
+function analyze(res,target_path){
+  var harAnalyzer = new har.HarAnalyzer(target_path);
+  var data = new HAR(harAnalyzer);
+  data.save(function (err) {
+    if(err){
+      res.send(500, { error: 'something blew up' });
+    }
+    fs.unlink(target_path,function(err){
+      if(err){
+        res.send(500, { error: 'something blew up' });
+      }
+      res.send(200,{status : "upload success"})
+
+
+    });
+  });
+}
+
