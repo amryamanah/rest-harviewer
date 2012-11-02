@@ -16,25 +16,26 @@ var harSchema = new Schema({
 	filename : String,
   label: String,
   date: {type: Date, default: Date.now},
+	request:Number,
+	redirect:Number,
+	badRequest:Number,
+
+	fullLoadTime:Number,
   timeOnLoad: Number,
   timeOnContentLoad: Number,
-  entry: {
-    dnsTime:Number,
-    transferTime:Number,
-    sendTime:Number,
-    serverTime:Number,
-    AvgConnectTime:Number,
-    AvgBlockingTime:Number,
-    responseSize:Number,
-    timeToFirstByte:Number,
-    fullLoadTime:Number,
-    request:Number,
-    redirect:Number,
-    badRequest:Number,
-    totalTextSize:Number,
-    totalFontSize:Number,
-    totalMediaSize:Number
-  }
+	timeToFirstByte:Number,
+  dnsTime:Number,
+  transferTime:Number,
+  sendTime:Number,
+  serverTime:Number,
+  AvgConnectTime:Number,
+  AvgBlockingTime:Number,
+
+	responseSize:Number,
+  totalTextSize:Number,
+  totalFontSize:Number,
+  totalMediaSize:Number
+
 });
 harSchema.set('toJSON', { getters: true, virtuals: false });
 
