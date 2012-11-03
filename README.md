@@ -6,18 +6,26 @@ rest-harviewer
 
 ##API GUIDE:
 
-+-------------------------+*-----------------------------*+------------------+--------------------+
-|     Resources           |        GET                    |       POST       |       DELETE       |
-+-------------------------+*-----------------------------*+------------------+--------------------+
-| /                       | Welcome mesage                |                  |                    |
-| /upload                 | Upload form                   |    upload file   |                    |
-| /list                   | List all files                |                  |                    |
-| /delete/?label=name     | Delete * w/ label             |                  | Delete * w/ label  |
-| /harviewer/:label/:type | label = "labelname"           |                  |                    |
-|                         | type = "datatype"             |                  |                    |
-|                         | return list of data w/        |                  |                    |
-|                         | "type" which label = "label"  |                  |                    |
-+-------------------------+-------------------------------+------------------+--------------------+
+- GET		/				Welcome Page
+- GET		/list				List all data
+- GET		/upload				Upload form
+- POST		/upload				Upload, analyze, and save analyze result in database
+- GET		/delete/?label="labelname"	delete all data with label="labelname"
+- DELETE	/delete/?label="labelname"	delete all data with label="labelname"
+- GET		/harviewer/:label/:type		return list of all datatype with label = "labelname"
+
+
+## sample
+- http://localhost:8080/harviewer/msn/request
+
+> 		{
+>		success: true,
+>		results: [{
+> 				name: "request",
+>				malaysia.msn.com1.har: 98,
+>				malaysia.msn.com.har: 115
+>			 }]
+>		}
 
 ## data type :
     - request
