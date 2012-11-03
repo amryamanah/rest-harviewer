@@ -1,7 +1,17 @@
 rest-harviewer
 ==============
 
+##Dependencies :
+- Install Mongodb
+- express
+- moment
+- mongoose
+- async
+
 ##Installation:
+   
+   > git clone https://github.com/ndoetz/rest-harviewer.git
+
    > npm install
 
 ##API GUIDE:
@@ -13,6 +23,26 @@ rest-harviewer
 - GET		/delete/?label="labelname"	delete all data with label="labelname"
 - DELETE	/delete/?label="labelname"	delete all data with label="labelname"
 - GET		/harviewer/:label/:type		return list of all datatype with label = "labelname"
+
+
+## data type :
+    - request
+	- redirect
+	- badrequest
+    - fullloadtime
+    - onloadtime
+    - oncontentloadtime
+    - timetofirstbyte
+    - dnstime
+    - transfertime
+    - sendtime
+    - servertime
+    - avgconnecttime
+    - avgblockingtime
+	- responsesize
+    - totaltextsize
+    - totalfontsize
+    - totalmediasize
 
 
 ## SAMPLE OUTPUT
@@ -58,22 +88,3 @@ rest-harviewer
  >			}]
  >	}
  >
-
-## data type :
-    - request
-	- redirect
-	- badrequest
-    - fullloadtime
-    - onloadtime
-    - oncontentloadtime
-    - timetofirstbyte
-    - dnstime
-    - transfertime
-    - sendtime
-    - servertime
-    - avgconnecttime
-    - avgblockingtime
-	- responsesize
-    - totaltextsize
-    - totalfontsize
-    - totalmediasize
