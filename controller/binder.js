@@ -33,12 +33,28 @@ function handle(x,name){
 	return result_type[name];
 }
 
-exports.resultGetter = function(har,name){
+exports.resultGetter2 = function(har,name){
 	var allResult = [];
 	var result = {};
 	result.name = name;
 	async.forEach(har, function (x, callback){
 		result[x.filename] = handle(x,name);
+	},function(err) {
+		console.log(err)
+	});
+	allResult.push(result);
+	return allResult;
+};
+
+exports.resultGetter = function(har,name){
+	var allResult = [];
+	var result = {};
+	result.name = name;
+	async.forEach(har, function (x, callback){
+		result[x.filename]={
+			data : handle(x,name),
+		  datetime : x.date
+		};
 	},function(err) {
 		console.log(err)
 	});
