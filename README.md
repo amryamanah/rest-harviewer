@@ -1,7 +1,17 @@
 rest-harviewer
 ==============
 
+##Dependencies :
+- Install Mongodb
+- express
+- moment
+- mongoose
+- async
+
 ##Installation:
+   
+   > git clone https://github.com/ndoetz/rest-harviewer.git
+
    > npm install
 
 ##API GUIDE:
