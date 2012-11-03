@@ -15,6 +15,26 @@ rest-harviewer
 - GET		/harviewer/:label/:type		return list of all datatype with label = "labelname"
 
 
+## data type :
+    - request
+	- redirect
+	- badrequest
+    - fullloadtime
+    - onloadtime
+    - oncontentloadtime
+    - timetofirstbyte
+    - dnstime
+    - transfertime
+    - sendtime
+    - servertime
+    - avgconnecttime
+    - avgblockingtime
+	- responsesize
+    - totaltextsize
+    - totalfontsize
+    - totalmediasize
+
+
 ## SAMPLE OUTPUT
 
 - http://localhost:8080/harviewer/msn/request
@@ -58,22 +78,3 @@ rest-harviewer
  >			}]
  >	}
  >
-
-## data type :
-    - request
-	- redirect
-	- badrequest
-    - fullloadtime
-    - onloadtime
-    - oncontentloadtime
-    - timetofirstbyte
-    - dnstime
-    - transfertime
-    - sendtime
-    - servertime
-    - avgconnecttime
-    - avgblockingtime
-	- responsesize
-    - totaltextsize
-    - totalfontsize
-    - totalmediasize
