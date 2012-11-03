@@ -15,7 +15,9 @@ rest-harviewer
 - GET		/harviewer/:label/:type		return list of all datatype with label = "labelname"
 
 
-## http://localhost:8080/harviewer/msn/request
+## SAMPLE OUTPUT
+
+- http://localhost:8080/harviewer/msn/request
 
 > 		{
 >		success: true,
@@ -26,9 +28,9 @@ rest-harviewer
 >			 }]
 >		}
 
-## http://localhost:8080/list
-'
- '	{
+- http://localhost:8080/list
+
+```	{
  > 		total: 1,
  > 		results: [{
  >				filename: "malaysia.msn.com1.har",
