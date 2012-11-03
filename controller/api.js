@@ -94,7 +94,7 @@ exports.find = function(req,res){
 exports.uploadform = function(req,res){
 	res.writeHead(200, {'content-type': 'text/html'});
 	res.write(
-		'<form action="/harviewer/upload" enctype="multipart/form-data" method="post">'+
+		'<form action="/upload" enctype="multipart/form-data" method="post">'+
 			'<input type="text" name="title"><br>'+
 			'<input type="file" name="file" multiple="multiple"><br>'+
 			'<input type="submit" value="Upload">'+
@@ -116,23 +116,23 @@ exports.list = function(req,res){
 
 function mapping(type,har){
 	var handler_type = {};
-	handler_type['request'] = binder.getAllRequest(har);
-	handler_type['redirect'] = binder.getAllRedirect(har);
-	handler_type['badrequest'] = binder.getAllBadRequest(har);
-	handler_type['fullloadtime'] = binder.getAllFullLoadTime(har);
-	handler_type['onload'] = binder.getAllOnLoadTime(har);
-	handler_type['oncontentload'] = binder.getAllContentLoadTime(har);
-	handler_type['timetofirstbyte'] = binder.getAllTimeToFirstByte(har);
-	handler_type['dnstime'] = binder.getAllDnsTime(har);
-	handler_type['transfertime'] = binder.getAllTransferTime(har);
-	handler_type['sendtime'] = binder.getAllSendTime(har);
-	handler_type['servertime'] = binder.getAllServerTime(har);
-	handler_type['connecttime'] = binder.getAllAvgConnectTime(har);
-	handler_type['blockingtime'] = binder.getAllAvgBlockingTime(har);
-	handler_type['responsesize'] = binder.getAllResponseSize(har);
-	handler_type['textsize'] = binder.getAllTotalTextSize(har);
-	handler_type['fontsize'] = binder.getAllTotalFontSize(har);
-	handler_type['mediasize'] = binder.getAllTotalMediaSize(har);
+	handler_type["request"] = binder.resultGetter(har,"request");
+	handler_type["redirect"] = binder.resultGetter(har,"redirect");
+	handler_type["badrequest"] = binder.resultGetter(har,"badrequest");
+	handler_type["fullloadtime"] = binder.resultGetter(har,"fullloadtime");
+	handler_type["onloadtime"] = binder.resultGetter(har,"onloadtime");
+	handler_type["oncontentloadtime"] = binder.resultGetter(har,"oncontentloadtime");
+	handler_type["timetofirstbyte"] = binder.resultGetter(har,"timetofirstbyte");
+	handler_type["dnstime"] = binder.resultGetter(har,"dnstime");
+	handler_type["transfertime"] = binder.resultGetter(har,"transfertime");
+	handler_type["sendtime"] = binder.resultGetter(har,"sendtime");
+	handler_type["servertime"] = binder.resultGetter(har,"servertime");
+	handler_type["avgconnecttime"] = binder.resultGetter(har,"avgconnecttime");
+	handler_type["avgblockingtime"] = binder.resultGetter(har,"avgblockingtime");
+	handler_type["responsesize"] = binder.resultGetter(har,"responsesize");
+	handler_type["totaltextsize"] = binder.resultGetter(har,"totaltextsize");
+	handler_type["totalfontsize"] = binder.resultGetter(har,"totalfontsize");
+	handler_type["totalmediasize"] = binder.resultGetter(har,"totalmediasize");
 
 	return handler_type[type];
 }
