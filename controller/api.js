@@ -14,34 +14,30 @@ var url = require('url');
 var har = require('../utils/harAnalyzer.js');
 var binder = require('./binder.js');
 
-function analyze(res,target_path){
-	var harAnalyzer = new har.HarAnalyzer(target_path);
-	var data = new HAR(harAnalyzer);
-	data.save(function (err) {
-		if(err){
-			res.send(500, { error: 'something blew up' });
+
+exports.handler = function (req,res){
+	console.log("im in handler");
+	console.log(req.params);
+	var label = req.params.label;
+	var type = req.params.type;
+
+	key = {
+		label : label
+	};
+	HAR.find(key,function (err, har) {
+		if(err) {
+			res.send(500, {
+				error: 'something blew up'
+			});
 		}
-		fs.unlink(target_path,function(err){
-			if(err){
-				res.send(500, { error: 'something blew up' });
-			}
-			res.send(200,{status : "upload success"})
-
-
+		if(har.length === 0) {
+			res.send(404, {error :'File Not Found'});
+		}
+		res.json(200,{
+			success:true,
+			results:mapping(type,har)
 		});
 	});
-}
-
-exports.uploadForm = function(req,res){
-	res.writeHead(200, {'content-type': 'text/html'});
-	res.write(
-		'<form action="/harviewer/upload" enctype="multipart/form-data" method="post">'+
-			'<input type="text" name="title"><br>'+
-			'<input type="file" name="file" multiple="multiple"><br>'+
-			'<input type="submit" value="Upload">'+
-			'</form>'
-	);
-	res.end();
 };
 
 exports.upload = function(req, res) {
@@ -62,7 +58,7 @@ exports.upload = function(req, res) {
 
 exports.delete = function(req,res){
 	parse = url.parse(req.url,true);
-
+	console.log(parse)
 	HAR.find(parse.query,function (error, har) {
 		if(error){
       res.send(500, { error: 'something blew up' });
@@ -80,16 +76,6 @@ exports.delete = function(req,res){
 	});
 };
 
-exports.list = function(req,res){
-
-  HAR.find(function (err, har) {
-	  if(err){
-      res.send(500, { error: 'something blew up' });
-    }
-    res.json(200,{total: har.length ,result: har });
-  });
-};
-
 exports.find = function(req,res){
 
   parse = url.parse(req.url,true);
@@ -101,294 +87,68 @@ exports.find = function(req,res){
 	  if(har.length === 0){
       res.send(404, {error :'File Not Found'});
     }
-    res.json(200,{total: har.length ,result: har });
+    res.json(200,{total: har.length ,results: har });
   });
 };
 
+exports.uploadform = function(req,res){
+	res.writeHead(200, {'content-type': 'text/html'});
+	res.write(
+		'<form action="/upload" enctype="multipart/form-data" method="post">'+
+			'<input type="text" name="title"><br>'+
+			'<input type="file" name="file" multiple="multiple"><br>'+
+			'<input type="submit" value="Upload">'+
+			'</form>'
+	);
+	res.end();
+};
 
-//TODO Refactor to more simple handler
-exports.request = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
+exports.list = function(req,res){
+	HAR.find(function (err, har) {
+		if(err){
+			res.send(500, { error: 'something blew up' });
 		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
+		else{
+			res.json(200,{total: har.length ,results: har });
 		}
-		res.json(200,binder.getAllRequest(har));
 	});
 };
 
-exports.redirect = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
+function mapping(type,har){
+	var handler_type = {};
+	handler_type["request"] = binder.resultGetter(har,"request");
+	handler_type["redirect"] = binder.resultGetter(har,"redirect");
+	handler_type["badrequest"] = binder.resultGetter(har,"badrequest");
+	handler_type["fullloadtime"] = binder.resultGetter(har,"fullloadtime");
+	handler_type["onloadtime"] = binder.resultGetter(har,"onloadtime");
+	handler_type["oncontentloadtime"] = binder.resultGetter(har,"oncontentloadtime");
+	handler_type["timetofirstbyte"] = binder.resultGetter(har,"timetofirstbyte");
+	handler_type["dnstime"] = binder.resultGetter(har,"dnstime");
+	handler_type["transfertime"] = binder.resultGetter(har,"transfertime");
+	handler_type["sendtime"] = binder.resultGetter(har,"sendtime");
+	handler_type["servertime"] = binder.resultGetter(har,"servertime");
+	handler_type["avgconnecttime"] = binder.resultGetter(har,"avgconnecttime");
+	handler_type["avgblockingtime"] = binder.resultGetter(har,"avgblockingtime");
+	handler_type["responsesize"] = binder.resultGetter(har,"responsesize");
+	handler_type["totaltextsize"] = binder.resultGetter(har,"totaltextsize");
+	handler_type["totalfontsize"] = binder.resultGetter(har,"totalfontsize");
+	handler_type["totalmediasize"] = binder.resultGetter(har,"totalmediasize");
+
+	return handler_type[type];
+}
+
+function analyze(res,target_path){
+	var harAnalyzer = new har.HarAnalyzer(target_path);
+	var data = new HAR(harAnalyzer);
+	data.save(function (err) {
+		if(err){
+			res.send(500, { error: 'something blew up' });
 		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllRedirect(har));
+		fs.unlink(target_path,function(err){
+			if(err){
+				res.send(500, { error: 'something blew up' });
+			}
+			res.send(200,{status : "upload success"})
+		});
 	});
-};
-
-exports.badrequest = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllBadRequest(har));
-	});
-};
-
-exports.fullloadtime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllFullLoadTime(har));
-	});
-};
-
-exports.onloadtime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllOnLoadTime(har));
-	});
-};
-
-exports.contentloadtime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllContentLoadTime(har));
-	});
-};
-
-exports.timetofirstbyte = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllTimeToFirstByte(har));
-	});
-};
-
-exports.dnstime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllDnsTime(har));
-	});
-};
-
-exports.transfertime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllTransferTime(har));
-	});
-};
-
-exports.sendtime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllSendTime(har));
-	});
-};
-
-exports.servertime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllServerTime(har));
-	});
-};
-
-exports.avgconnecttime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllAvgConnectTime(har));
-	});
-};
-
-exports.avgblockingtime = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllAvgBlockingTime(har));
-	});
-};
-
-exports.responsesize = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllResponseSize(har));
-	});
-};
-
-exports.totaltextsize = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllTotalTextSize(har));
-	});
-};
-
-exports.totalfontsize = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllTotalFontSize(har));
-	});
-};
-
-exports.totalmediasize = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse);
-	HAR.find(parse.query,function (err, har) {
-		if(err) {
-			res.send(500, {
-				error: 'something blew up'
-			});
-		}
-		if(har.length === 0) {
-			res.send(404, {error :'File Not Found'});
-		}
-		res.json(200,binder.getAllTotalMediaSize(har));
-	});
-};
-
-//function getAllLoadTime(har){
-//	var allLoadTimes = [];
-//	var fullLoadTime = {};
-//	fullLoadTime.name = "fullLoadTime";
-//	for (var i=0;i<har.length;i++) {
-//		fullLoadTime["data" + i] = har[i].fullLoadTime;
-//	}
-//	allLoadTimes.push(fullLoadTime);
-//	return allLoadTimes
-//}
-
-
-
+}

@@ -43,42 +43,20 @@ app.configure(function () {
 });
 
 // set up the RESTful API, handler methods are defined in api.js
-//app.get('/harviewer/save', api.save);
-//example use http://localhost:3002/harviewer/find/?_id=508d524fb4c88d9f0e000003
-//example use http://localhost:3002/harviewer/delete/?_id=508d524fb4c88d9f0e000003
-app.get('/harviewer', api.list);
-app.get('/harviewer/delete', api.delete);
-app.get('/harviewer/find', api.find);
 
-app.get('/harviewer/upload', api.uploadForm);
+app.get('/', function(req,res){
+	res.send(200,"WELCOME TO REST HARVIEWER");
+});
+app.get('/list', api.list);
+app.get('/delete', api.delete);
+app.get('/find', api.find);
+app.get('/upload', api.uploadform);
 
-app.post('/harviewer/upload', api.upload);
+app.post('/upload', api.upload);
+app.delete('/delete', api.delete);
+app.put('/upload', api.upload);
 
-app.delete('/harviewer/delete', api.delete);
-
-app.put('/haviewer/upload', api.upload);
-
-//TODO Refactor to more simple handler
-app.get('/harviewer/sort/request', api.request);
-app.get('/harviewer/sort/redirect', api.redirect);
-app.get('/harviewer/sort/badrequest', api.badrequest);
-app.get('/harviewer/sort/fullloadtime', api.fullloadtime);
-app.get('/harviewer/sort/onloadtime', api.onloadtime);
-app.get('/harviewer/sort/contentloadtime', api.contentloadtime);
-app.get('/harviewer/sort/timetofirstbyte', api.timetofirstbyte);
-app.get('/harviewer/sort/dnstime', api.dnstime);
-
-app.get('/harviewer/sort/transfertime', api.transfertime);
-app.get('/harviewer/sort/sendtime', api.sendtime);
-app.get('/harviewer/sort/servertime', api.servertime);
-app.get('/harviewer/sort/avgconnecttime', api.avgconnecttime);
-app.get('/harviewer/sort/avgblockingtime', api.avgblockingtime);
-app.get('/harviewer/sort/responsesize', api.responsesize);
-app.get('/harviewer/sort/totaltextsize', api.totaltextsize);
-app.get('/harviewer/sort/totalfontsize', api.totalfontsize);
-app.get('/harviewer/sort/totalmediasize', api.totalmediasize);
-
-
+app.get('/harviewer/:label/:type',api.handler);
 
 appPort = 8080;
 //  And start the app on that interface (and port).
@@ -87,7 +65,6 @@ app.listen(appPort,function(err){
     console.log(err);
   }
   console.log("application started at " + appPort);
-
 });
 
 
