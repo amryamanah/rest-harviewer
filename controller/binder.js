@@ -10,6 +10,7 @@
 var async = require('async');
 
 //TODO Refactor to more simple handler
+
 exports.getAllFullLoadTime = function(har){
 	var allLoadTimes = [];
 	var fullLoadTime = {};
