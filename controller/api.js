@@ -35,6 +35,7 @@ exports.handler = function (req,res){
 		}
 		res.json(200,{
 			success:true,
+			count:har.length,
 			results:mapping(type,har)
 		});
 	});
@@ -80,7 +81,11 @@ exports.find = function(req,res){
 
   parse = url.parse(req.url,true);
 	console.log(parse);
-  HAR.find(parse.query,function (err, har) {
+	key ={
+		label : parse.query.label
+	}
+	console.log(key);
+  HAR.find(key,function (err, har) {
 	  if(err){
       res.send(500, { error: 'something blew up' });
     }

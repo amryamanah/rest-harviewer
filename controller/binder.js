@@ -36,15 +36,16 @@ function handle(x,name){
 exports.resultGetter = function(har,name){
 	var allResult = [];
 	var result = {};
-	result.name = name;
+	result.data = [];
 	async.forEach(har, function (x, callback){
-		result[x.filename]={
-			data : handle(x,name),
-		  datetime : x.date
-		};
+		result.data.push({
+			value :handle(x,name),
+			date :x.date,
+			filename :x.filename
+		});
 	},function(err) {
 		console.log(err)
 	});
 	allResult.push(result);
-	return allResult;
+	return result.data;
 };
