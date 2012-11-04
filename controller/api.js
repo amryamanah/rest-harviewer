@@ -58,9 +58,10 @@ exports.upload = function(req, res) {
 };
 
 exports.delete = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse)
-	HAR.find(parse.query,function (error, har) {
+	key = {
+		label : req.params.label
+	};
+	HAR.find(key,function (error, har) {
 		if(error){
       res.send(500, { error: 'something blew up' });
     }
@@ -68,22 +69,18 @@ exports.delete = function(req,res){
       res.send(404, {error :'File Not Found'});
     }
 		else{
-			HAR.remove(parse.query,function(err) {
+			HAR.remove(key,function(err) {
 				if(err)notFound(err);
-				console.log(parse.query);
-				res.send('200',{status :"Delete request for " + JSON.stringify(parse.query) + " success"} );
+				res.send('200',{status :"Delete request for " + JSON.stringify(key) + " success"} );
 			});
 		}
 	});
 };
 
 exports.find = function(req,res){
-
-  parse = url.parse(req.url,true);
-	console.log(parse);
-	key ={
-		label : parse.query.label
-	}
+	key = {
+		label : req.params.label
+	};
 	console.log(key);
   HAR.find(key,function (err, har) {
 	  if(err){
