@@ -35,6 +35,7 @@ exports.handler = function (req,res){
 		}
 		res.json(200,{
 			success:true,
+			count:har.length,
 			results:mapping(type,har)
 		});
 	});
@@ -57,9 +58,10 @@ exports.upload = function(req, res) {
 };
 
 exports.delete = function(req,res){
-	parse = url.parse(req.url,true);
-	console.log(parse)
-	HAR.find(parse.query,function (error, har) {
+	key = {
+		label : req.params.label
+	};
+	HAR.find(key,function (error, har) {
 		if(error){
       res.send(500, { error: 'something blew up' });
     }
@@ -67,20 +69,20 @@ exports.delete = function(req,res){
       res.send(404, {error :'File Not Found'});
     }
 		else{
-			HAR.remove(parse.query,function(err) {
+			HAR.remove(key,function(err) {
 				if(err)notFound(err);
-				console.log(parse.query);
-				res.send('200',{status :"Delete request for " + JSON.stringify(parse.query) + " success"} );
+				res.send('200',{status :"Delete request for " + JSON.stringify(key) + " success"} );
 			});
 		}
 	});
 };
 
 exports.find = function(req,res){
-
-  parse = url.parse(req.url,true);
-	console.log(parse);
-  HAR.find(parse.query,function (err, har) {
+	key = {
+		label : req.params.label
+	};
+	console.log(key);
+  HAR.find(key,function (err, har) {
 	  if(err){
       res.send(500, { error: 'something blew up' });
     }
@@ -116,23 +118,7 @@ exports.list = function(req,res){
 
 function mapping(type,har){
 	var handler_type = {};
-	handler_type["request"] = binder.resultGetter(har,"request");
-	handler_type["redirect"] = binder.resultGetter(har,"redirect");
-	handler_type["badrequest"] = binder.resultGetter(har,"badrequest");
-	handler_type["fullloadtime"] = binder.resultGetter(har,"fullloadtime");
-	handler_type["onloadtime"] = binder.resultGetter(har,"onloadtime");
-	handler_type["oncontentloadtime"] = binder.resultGetter(har,"oncontentloadtime");
-	handler_type["timetofirstbyte"] = binder.resultGetter(har,"timetofirstbyte");
-	handler_type["dnstime"] = binder.resultGetter(har,"dnstime");
-	handler_type["transfertime"] = binder.resultGetter(har,"transfertime");
-	handler_type["sendtime"] = binder.resultGetter(har,"sendtime");
-	handler_type["servertime"] = binder.resultGetter(har,"servertime");
-	handler_type["avgconnecttime"] = binder.resultGetter(har,"avgconnecttime");
-	handler_type["avgblockingtime"] = binder.resultGetter(har,"avgblockingtime");
-	handler_type["responsesize"] = binder.resultGetter(har,"responsesize");
-	handler_type["totaltextsize"] = binder.resultGetter(har,"totaltextsize");
-	handler_type["totalfontsize"] = binder.resultGetter(har,"totalfontsize");
-	handler_type["totalmediasize"] = binder.resultGetter(har,"totalmediasize");
+	handler_type[type] = binder.resultGetter(har,type);
 
 	return handler_type[type];
 }

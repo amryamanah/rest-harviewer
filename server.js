@@ -39,21 +39,21 @@ app.configure(function () {
   app.use(express.methodOverride());
   app.use(app.router);
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	app.use(express.static(__dirname + '/public'));
+	app.use(express.static(__dirname + '/frontend'));
 });
 
 // set up the RESTful API, handler methods are defined in api.js
 
 app.get('/', function(req,res){
-	res.send(200,"WELCOME TO REST HARVIEWER");
+	res.sendfile("./frontend/index.html")
 });
 app.get('/list', api.list);
-app.get('/delete', api.delete);
-app.get('/find', api.find);
+app.get('/delete/:label', api.delete);
+app.get('/find/:label', api.find);
 app.get('/upload', api.uploadform);
 
 app.post('/upload', api.upload);
-app.delete('/delete', api.delete);
+app.delete('/delete/:label', api.delete);
 app.put('/upload', api.upload);
 
 app.get('/harviewer/:label/:type',api.handler);
