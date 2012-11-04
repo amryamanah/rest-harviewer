@@ -39,13 +39,13 @@ app.configure(function () {
   app.use(express.methodOverride());
   app.use(app.router);
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-	app.use(express.static(__dirname + '/public'));
+	app.use(express.static(__dirname + '/frontend'));
 });
 
 // set up the RESTful API, handler methods are defined in api.js
 
 app.get('/', function(req,res){
-	res.send(200,"WELCOME TO REST HARVIEWER");
+	res.sendfile("./frontend/index.html")
 });
 app.get('/list', api.list);
 app.get('/delete/:label', api.delete);
