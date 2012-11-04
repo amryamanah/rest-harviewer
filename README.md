@@ -22,6 +22,7 @@ rest-harviewer
 - POST		/upload				Upload, analyze, and save analyze result in database
 - GET		/delete/?label="labelname"	delete all data with label="labelname"
 - DELETE	/delete/?label="labelname"	delete all data with label="labelname"
+- GET		/find/:label			get all data with label = "label"
 - GET		/harviewer/:label/:type		return list of all datatype with label = "labelname"
 
 
@@ -51,10 +52,11 @@ rest-harviewer
 
 > 		{
 >		success: true,
+>		count: 1,
 >		results: [{
-> 				name: "request",
->				malaysia.msn.com1.har: 98,
->				malaysia.msn.com.har: 115
+> 				value: 1506,
+>				date: "2012-11-03T08:32:12.735Z",
+>				filename: "malaysia.msn.com1.har"
 >			 }]
 >		}
 
