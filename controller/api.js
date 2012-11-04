@@ -13,6 +13,8 @@ var HAR = require('../model/har.js');
 var url = require('url');
 var har = require('../utils/harAnalyzer.js');
 var binder = require('./binder.js');
+var exec = require('child_process').exec;
+
 
 
 exports.handler = function (req,res){
@@ -68,6 +70,26 @@ exports.delete = function(req,res){
 		if(har.length === 0){
       res.send(404, {error :'File Not Found'});
     }
+		else{
+			HAR.remove(key,function(err) {
+				if(err)notFound(err);
+				res.send('200',{status :"Delete request for " + JSON.stringify(key) + " success"} );
+			});
+		}
+	});
+};
+
+exports.delete2 = function(req,res){
+	key = {
+		filename : req.params.label
+	};
+	HAR.find(key,function (error, har) {
+		if(error){
+			res.send(500, { error: 'something blew up' });
+		}
+		if(har.length === 0){
+			res.send(404, {error :'File Not Found'});
+		}
 		else{
 			HAR.remove(key,function(err) {
 				if(err)notFound(err);
@@ -138,3 +160,20 @@ function analyze(res,target_path){
 		});
 	});
 }
+
+
+exports.runner = function(req,res){
+	console.log(req.params.victim);
+	var victim = "http://" + req.params.victim;
+	var netsniff = __dirname + "/netsniff.js ";
+	console.log(victim);
+	console.log(netsniff);
+	var result;
+	result = exec('phantomjs ' + netsniff + victim + " > "+ req.params.victim+".har",function (err,stdout,stderr){
+		if (err){
+			console.log("some error" + err);
+		}
+		analyze(res,req.params.victim+".har");
+	});
+
+};

@@ -57,6 +57,7 @@ app.delete('/delete/:label', api.delete);
 app.put('/upload', api.upload);
 
 app.get('/harviewer/:label/:type',api.handler);
+app.get('/runner/:victim', api.runner);
 
 appPort = 8080;
 //  And start the app on that interface (and port).
