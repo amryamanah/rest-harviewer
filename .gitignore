@@ -8,6 +8,7 @@ lib-cov
 *.pid
 *.gz
 
+nohup.out
 pids
 logs
 results
