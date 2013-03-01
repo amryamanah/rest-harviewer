@@ -7,7 +7,7 @@ var JSONDATA,
 Ext.Ajax.request({
   method : "get",
   async  : true,
-  url    : "http://ndoetz.rest-harviewer.jit.su/list",
+  url    : "http://localhost:8080/list",
   callback: function(options, success, response) {
     JSONDATA = JSON.parse(response.responseText).results;
 

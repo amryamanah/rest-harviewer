@@ -42,6 +42,8 @@ exports.handler = function (req,res){
 };
 
 exports.upload = function(req, res) {
+	console.log("REQUEST COME");
+	console.log(req);
 	var tmp_path = req.files.file.path;
 	var target_path = './' + req.files.file.name;
 	fs.rename(tmp_path, target_path, function(err) {
@@ -55,6 +57,7 @@ exports.upload = function(req, res) {
 			analyze(res,target_path);
 		});
 	});
+
 };
 
 exports.delete = function(req,res){
@@ -106,6 +109,8 @@ exports.uploadform = function(req,res){
 };
 
 exports.list = function(req,res){
+	console.log("REQUEST COME");
+	console.log(req);
 	HAR.find(function (err, har) {
 		if(err){
 			res.send(500, { error: 'something blew up' });
